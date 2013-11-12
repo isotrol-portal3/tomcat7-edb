@@ -54,17 +54,21 @@ public final class EncryptedDataSourceFactory extends BasicDataSourceFactory {
 	@SuppressWarnings("rawtypes")
 	public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable environment) throws Exception {
 		if (obj instanceof Reference) {
-			// TODO
+			Reference ref = (Reference)obj;
+			decryptParameter("username", ref);
+			decryptParameter("password", ref);
 		}
 		return super.getObjectInstance(obj, name, nameCtx, environment);
 	}
 
 	private void decryptParameter(String paramName, Reference ref) throws Exception {
 		Enumeration<RefAddr> enu = ref.getAll();
-		while (enu.hasMoreElements()) {
+		for (int i= 0; enu.hasMoreElements(); i++) {
 			RefAddr addr = enu.nextElement();
 			if (addr.getType().equals(paramName)) {
-				// TODO
+				RefAddr decrypted = decryptValue(paramName, addr);
+				ref.remove(i);
+				ref.add(i, decrypted);
 				return;
 			}
 		}
@@ -73,8 +77,10 @@ public final class EncryptedDataSourceFactory extends BasicDataSourceFactory {
 	
 	private RefAddr decryptValue(String paramName, RefAddr addr) throws Exception {
 		try {
-			// TODO
-			return addr;
+			final String encrypted = addr.getContent().toString();
+			// TODO decrypt
+			final String decrypted = encrypted;
+			return new StringRefAddr(paramName, decrypted);
 		} catch(Exception e) {
 			throw new Exception(String.format("Unable to decrypt parameter [%s] for EncryptedDataSourceFactory", paramName), e);
 		}
