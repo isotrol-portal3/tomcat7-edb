@@ -29,7 +29,7 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
-import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory;
 
 
 /**
@@ -78,8 +78,7 @@ public final class EncryptedDataSourceFactory extends BasicDataSourceFactory {
 	private RefAddr decryptValue(String paramName, RefAddr addr) throws Exception {
 		try {
 			final String encrypted = addr.getContent().toString();
-			// TODO decrypt
-			final String decrypted = encrypted;
+			final String decrypted = Encrypter.decrypt(encrypted);
 			return new StringRefAddr(paramName, decrypted);
 		} catch(Exception e) {
 			throw new Exception(String.format("Unable to decrypt parameter [%s] for EncryptedDataSourceFactory", paramName), e);
